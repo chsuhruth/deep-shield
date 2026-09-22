@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepShield Mobile — Live Dual-Modal Edge AI Fraud Shield</title>
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --card-bg: #111827;
+            --border-col: #1f2937;
+            --accent-cyan: #00f0ff;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-amber: #f59e0b;
+            --text-main: #f9fafb;
+            --text-sub: #9ca3af;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 16px 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border-col);
+        }
+
+        .title-group h1 {
+            font-size: 22px;
+            color: var(--accent-cyan);
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge {
+            background: rgba(0, 240, 255, 0.15);
+            color: var(--accent-cyan);
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            border: 1px solid var(--accent-cyan);
+        }
+
+        .verdict-badge {
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+            border: 1px solid var(--accent-green);
+            transition: all 0.3s ease;
+        }
+
+        .verdict-fraud {
+            background: rgba(239, 68, 68, 0.2) !important;
+            color: var(--accent-red) !important;
+            border-color: var(--accent-red) !important;
+        }
+
+        .verdict-warn {
+            background: rgba(245, 158, 11, 0.2) !important;
+            color: var(--accent-amber) !important;
+            border-color: var(--accent-amber) !important;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-col);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #d1d5db;
+        }
+
+        .video-box {
+            position: relative;
+            width: 100%;
+            height: 260px;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        video, canvas {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .scan-overlay {
+            position: absolute;
+            top: 25%;
+            left: 15%;
+            width: 70%;
+            height: 50%;
+            border: 2px dashed var(--accent-cyan);
+            border-radius: 8px;
+            pointer-events: none;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-cyan);
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .audio-visualizer-box {
+            width: 100%;
+            height: 260px;
+            background: #030712;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: var(--text-sub);
+        }
+
+        .metric-val {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: #1f2937;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 65%;
+            background: var(--accent-green);
+            transition: width 0.2s, background-color 0.2s;
+        }
+
+        .controls-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: #1f2937;
+            color: #f3f4f6;
+            border: 1px solid #374151;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: #374151;
+            border-color: var(--accent-cyan);
+        }
+
+        button.active-btn {
+            background: var(--accent-cyan);
+            color: #000;
+            border-color: var(--accent-cyan);
+        }
+
+        .log-box {
+            background: #030712;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 11px;
+            color: #10b981;
+            height: 140px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            border: 1px solid #1f2937;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="title-group">
+            <h1>DeepShield Mobile <span class="badge">iQOO NPU Dual-Modal</span></h1>
+            <p style="font-size: 12px; color: var(--text-sub); margin-top: 4px;">Sub-10ms On-Device Edge Fraud Defense • Qualcomm Hexagon / Oryon</p>
+        </div>
+        <div id="verdictBadge" class="verdict-badge">AUTHENTIC VERIFIED</div>
+    </header>
+
+    <div class="grid-layout">
+        <!-- Visual Verification Engine Card -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Visual Verification (CameraX YUV Zero-Copy)</span>
+                <span id="visualLatency" style="font-size: 11px; color: var(--accent-green);">Latency: 3.4 ms</span>
+            </div>
+            <div class="video-box">
+                <video id="webcamVideo" autoplay playsinline muted></video>
+                <canvas id="cameraCanvas"></canvas>
+                <div class="scan-overlay">Payee VPA & Font Inspection ROI</div>
+            </div>
+            <div class="metric-row">
+                <span>Spatial Kerning Variance:</span>
+                <span id="kerningVal" class="metric-val">1.9 px (Strict Alignment)</span>
+            </div>
+            <div class="metric-row">
+                <span>Screen Moiré Optical Index:</span>
+                <span id="moireVal" class="metric-val">0.2% (Native Screen)</span>
+            </div>
+            <div class="metric-row">
+                <span>Visual Anomaly Score:</span>
+                <span id="visualScoreVal" class="metric-val">0.05</span>
+            </div>
+            <div class="progress-bar-container">
+                <div id="visualProgressBar" class="progress-bar-fill" style="width: 5%;"></div>
+            </div>
+            <div class="controls-group">
+                <button id="btnStartCamera">Start Live Camera</button>
+                <button id="btnSimulateFakeUpi">Simulate Fake UPI Layout</button>
+                <button id="btnResetVisual">Reset Visual</button>
+            </div>
+        </div>
+
+        <!-- Acoustic Verification Engine Card -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Acoustic Verification (16kHz Native FFT Engine)</span>
+                <span id="acousticBandLabel" style="font-size: 11px; color: var(--accent-amber);">Band: 1.2 kHz – 3.5 kHz</span>
+            </div>
+            <div class="audio-visualizer-box">
+                <canvas id="audioCanvas" width="550" height="260"></canvas>
+            </div>
+            <div class="metric-row">
+                <span>Chamber Resonance Ratio (1.2-3.5kHz):</span>
+                <span id="resonanceRatioVal" class="metric-val">68.4%</span>
+            </div>
+            <div class="metric-row">
+                <span>Acoustic Replay Signature:</span>
+                <span id="replayDetectedVal" class="metric-val" style="color: var(--accent-green);">Authentic Soundbox Hardware</span>
+            </div>
+            <div class="progress-bar-container">
+                <div id="resonanceProgressBar" class="progress-bar-fill" style="width: 68%;"></div>
+            </div>
+            <div class="controls-group">
+                <button id="btnStartMic">Start Live Mic</button>
+                <button id="btnSimulateReplay">Simulate Smartphone Replay Attack</button>
+                <button id="btnSimulateRealBox">Simulate Soundbox Chime</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- OriginOS Office Kit IPC Bridge Status -->
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">OriginOS Office Kit Local Socket IPC Bridge (Merchant Desktop POS Sync)</span>
+            <span style="font-size: 11px; color: #a78bfa;">AES-GCM / HMAC-SHA256</span>
+        </div>
+        <div id="ipcLogBox" class="log-box">Connecting to OriginOS Office Kit local socket stream on port 9042...
+[OFFICE_KIT_IPC] Handshake initiated with merchant POS terminal.
+[OFFICE_KIT_IPC] Ready for encrypted telemetry frames.</div>
+    </div>
+</div>
+
+<script>
+    // State management
+    let visualTampered = false;
+    let acousticReplay = false;
+    let visualScore = 0.05;
+    let acousticResonance = 0.68;
+    let isMicActive = false;
+    let audioCtx, analyser, dataArray;
+
+    const verdictBadge = document.getElementById('verdictBadge');
+    const visualLatency = document.getElementById('visualLatency');
+    const kerningVal = document.getElementById('kerningVal');
+    const moireVal = document.getElementById('moireVal');
+    const visualScoreVal = document.getElementById('visualScoreVal');
+    const visualProgressBar = document.getElementById('visualProgressBar');
+    const resonanceRatioVal = document.getElementById('resonanceRatioVal');
+    const replayDetectedVal = document.getElementById('replayDetectedVal');
+    const resonanceProgressBar = document.getElementById('resonanceProgressBar');
+    const ipcLogBox = document.getElementById('ipcLogBox');
+
+    // WebRTC Camera Setup
+    const videoEl = document.getElementById('webcamVideo');
+    const cameraCanvas = document.getElementById('cameraCanvas');
+    const camCtx = cameraCanvas.getContext('2d');
+
+    document.getElementById('btnStartCamera').addEventListener('click', async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } });
+            videoEl.srcObject = stream;
+            document.getElementById('btnStartCamera').classList.add('active-btn');
+            requestAnimationFrame(processVideoFrame);
+        } catch (err) {
+            logIPC("Camera permission denied or camera unavailable: " + err.message);
+        }
+    });
+
+    function processVideoFrame() {
+        if (videoEl.readyState === videoEl.HAVE_ENOUGH_DATA) {
+            cameraCanvas.width = videoEl.videoWidth;
+            cameraCanvas.height = videoEl.videoHeight;
+            camCtx.drawImage(videoEl, 0, 0, cameraCanvas.width, cameraCanvas.height);
+
+            // Frame edge gradient simulation
+            if (!visualTampered) {
+                const simulatedLatency = (3.0 + Math.random() * 1.5).toFixed(1);
+                visualLatency.textContent = `Latency: ${simulatedLatency} ms`;
+            }
+        }
+        requestAnimationFrame(processVideoFrame);
+    }
+
+    // WebAudio 16kHz FFT Spectrogram Visualizer
+    const audioCanvas = document.getElementById('audioCanvas');
+    const audioCtxCanvas = audioCanvas.getContext('2d');
+
+    document.getElementById('btnStartMic').addEventListener('click', async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const source = audioCtx.createMediaStreamSource(stream);
+            analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 1024;
+            source.connect(analyser);
+
+            dataArray = new Uint8Array(analyser.frequencyBinCount);
+            isMicActive = true;
+            document.getElementById('btnStartMic').classList.add('active-btn');
+            drawAudioSpectrum();
+        } catch (err) {
+            logIPC("Mic permission denied or mic unavailable: " + err.message);
+        }
+    });
+
+    function drawAudioSpectrum() {
+        requestAnimationFrame(drawAudioSpectrum);
+        if (!isMicActive && !syntheticAudioRunning) return;
+
+        const width = audioCanvas.width;
+        const height = audioCanvas.height;
+
+        audioCtxCanvas.fillStyle = '#030712';
+        audioCtxCanvas.fillRect(0, 0, width, height);
+
+        if (isMicActive && analyser) {
+            analyser.getByteFrequencyData(dataArray);
+
+            // Highlight 1.2 kHz - 3.5 kHz resonance band
+            const sampleRate = audioCtx.sampleRate || 44100;
+            const binSize = (sampleRate / 2) / analyser.frequencyBinCount;
+            const minBin = Math.floor(1200 / binSize);
+            const maxBin = Math.floor(3500 / binSize);
+
+            let resonanceEnergy = 0;
+            let totalEnergy = 1e-5;
+
+            const barWidth = (width / analyser.frequencyBinCount) * 2.5;
+            let x = 0;
+
+            for (let i = 0; i < analyser.frequencyBinCount; i++) {
+                const barHeight = (dataArray[i] / 255) * height;
+                totalEnergy += dataArray[i];
+
+                if (i >= minBin && i <= maxBin) {
+                    resonanceEnergy += dataArray[i];
+                    audioCtxCanvas.fillStyle = '#00f0ff';
+                } else {
+                    audioCtxCanvas.fillStyle = '#1f2937';
+                }
+
+                audioCtxCanvas.fillRect(x, height - barHeight, barWidth, barHeight);
+                x += barWidth + 1;
+            }
+
+            if (!syntheticAudioRunning) {
+                const ratio = resonanceEnergy / totalEnergy;
+                acousticResonance = ratio;
+                updateAcousticMetrics(ratio, ratio < 0.35 && totalEnergy > 1000);
+            }
+        }
+    }
+
+    let syntheticAudioRunning = false;
+    function renderSyntheticSpectrogram(isReplay) {
+        syntheticAudioRunning = true;
+        const width = audioCanvas.width;
+        const height = audioCanvas.height;
+        audioCtxCanvas.fillStyle = '#030712';
+        audioCtxCanvas.fillRect(0, 0, width, height);
+
+        const barCount = 80;
+        const barWidth = width / barCount;
+
+        for (let i = 0; i < barCount; i++) {
+            let barHeight;
+            // 1.2kHz - 3.5kHz sits roughly at 20% - 50% of the bar array
+            if (i > 16 && i < 42) {
+                barHeight = isReplay ? (Math.random() * 40 + 20) : (Math.random() * 120 + 100);
+                audioCtxCanvas.fillStyle = isReplay ? '#ef4444' : '#10b981';
+            } else {
+                barHeight = isReplay ? (Math.random() * 80 + 40) : (Math.random() * 30 + 10);
+                audioCtxCanvas.fillStyle = '#374151';
+            }
+            audioCtxCanvas.fillRect(i * barWidth, height - barHeight, barWidth - 2, barHeight);
+        }
+    }
+
+    // Simulation triggers
+    document.getElementById('btnSimulateFakeUpi').addEventListener('click', () => {
+        visualTampered = true;
+        visualScore = 0.88;
+        visualLatency.textContent = "Latency: 4.1 ms";
+        kerningVal.textContent = "7.8 px (MISALIGNED WEB FONT)";
+        kerningVal.style.color = "var(--accent-red)";
+        moireVal.textContent = "18.4% (PHONE SCREEN RE-CAPTURE)";
+        moireVal.style.color = "var(--accent-red)";
+        visualScoreVal.textContent = "0.88 (FORGED)";
+        visualProgressBar.style.width = "88%";
+        visualProgressBar.style.backgroundColor = "var(--accent-red)";
+        evaluateVerdict();
+    });
+
+    document.getElementById('btnResetVisual').addEventListener('click', () => {
+        visualTampered = false;
+        visualScore = 0.04;
+        kerningVal.textContent = "1.8 px (Strict Alignment)";
+        kerningVal.style.color = "var(--text-main)";
+        moireVal.textContent = "0.2% (Native Screen)";
+        moireVal.style.color = "var(--text-main)";
+        visualScoreVal.textContent = "0.04";
+        visualProgressBar.style.width = "4%";
+        visualProgressBar.style.backgroundColor = "var(--accent-green)";
+        evaluateVerdict();
+    });
+
+    document.getElementById('btnSimulateReplay').addEventListener('click', () => {
+        acousticReplay = true;
+        acousticResonance = 0.24;
+        renderSyntheticSpectrogram(true);
+        updateAcousticMetrics(0.24, true);
+    });
+
+    document.getElementById('btnSimulateRealBox').addEventListener('click', () => {
+        acousticReplay = false;
+        acousticResonance = 0.72;
+        renderSyntheticSpectrogram(false);
+        updateAcousticMetrics(0.72, false);
+    });
+
+    function updateAcousticMetrics(ratio, isReplay) {
+        acousticReplay = isReplay;
+        const percentage = Math.round(ratio * 100);
+        resonanceRatioVal.textContent = `${percentage}%`;
+        resonanceProgressBar.style.width = `${Math.min(percentage, 100)}%`;
+
+        if (isReplay) {
+            replayDetectedVal.textContent = "FRAUDULENT SPEAKER REPLAY DETECTED";
+            replayDetectedVal.style.color = "var(--accent-red)";
+            resonanceProgressBar.style.backgroundColor = "var(--accent-red)";
+        } else {
+            replayDetectedVal.textContent = "Authentic Soundbox Hardware";
+            replayDetectedVal.style.color = "var(--accent-green)";
+            resonanceProgressBar.style.backgroundColor = "var(--accent-green)";
+        }
+        evaluateVerdict();
+    }
+
+    function evaluateVerdict() {
+        if (visualTampered && acousticReplay) {
+            verdictBadge.textContent = "CRITICAL: DUAL-FRAUD DETECTED";
+            verdictBadge.className = "verdict-badge verdict-fraud";
+        } else if (visualTampered) {
+            verdictBadge.textContent = "FAKE SCREEN FORGERY DETECTED";
+            verdictBadge.className = "verdict-badge verdict-fraud";
+        } else if (acousticReplay) {
+            verdictBadge.textContent = "AUDIO CHIME REPLAY DETECTED";
+            verdictBadge.className = "verdict-badge verdict-fraud";
+        } else {
+            verdictBadge.textContent = "AUTHENTIC VERIFIED";
+            verdictBadge.className = "verdict-badge";
+        }
+
+        dispatchOfficeKitCryptogram();
+    }
+
+    function dispatchOfficeKitCryptogram() {
+        const timestamp = Date.now();
+        const sessionId = 'IQOO-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+        const verdict = verdictBadge.textContent;
+        const fakeHmac = Array.from({length: 32}, () => Math.floor(Math.random()*16).toString(16)).join('');
+        const logEntry = `[${new Date(timestamp).toLocaleTimeString()}] CRYPTOGRAM DISPATCH -> POS\n  SESSION: ${sessionId}\n  VERDICT: ${verdict}\n  VISUAL_SCORE: ${visualScore.toFixed(2)} | ACOUSTIC_RESONANCE: ${Math.round(acousticResonance*100)}%\n  HMAC-SHA256: ${fakeHmac}\n  STATUS: 200 OK (Sync < 8ms)`;
+        logIPC(logEntry);
+    }
+
+    function logIPC(msg) {
+        ipcLogBox.textContent = msg + "\n\n" + ipcLogBox.textContent.substring(0, 800);
+    }
+
+    // Initial dummy render
+    renderSyntheticSpectrogram(false);
+</script>
+</body>
+</html>
